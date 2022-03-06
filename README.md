@@ -34,19 +34,20 @@ The first four exams belong to the [SamiTrop dataset](https://doi.org/10.5281/ze
 the [CODE-15% dataset](https://doi.org/10.5281/zenodo.4916206).  You can check them there by searching for the 
 corresponding exam ids.
 
-# Plot the exam before and after the preprocessing
+# Example: plot the exam before and after the removing baseline
 
-Before preprocessing:
+Before removing baseline:
 ```sh
-PATH_TO_EXAM=example_exams/TNMG2905463_N1
-python plot_from_wfdb.py $PATH_TO_EXAM
+PATH_TO_EXAM=example_exams/TNMG247001_N1
+python plot_from_wfdb.py $PATH_TO_EXAM --use_all_leads
 ```
+![before](./img/before.png)
 
-After preprocessing:
+After  removing baseline:
 ```sh
-python plot_from_wfdb.py $PATH_TO_EXAM --preprocess_ecg --remove_baseline --use_all_leads
+python plot_from_wfdb.py $PATH_TO_EXAM --remove_baseline --use_all_leads
 ```
-
+![after](./img/after.png)
 
 # Generate HDF5 from WFDB
 
@@ -62,8 +63,8 @@ The datasets:
 
 were obtained by something equivalent to the following command. 
 ```sh
-python generate_h5.py --scale 2 --use_all_leads example_exams/RECORDS.txt example_exams.h5
+python generate_h5.py --scale 2 --use_all_leads --new_freq 400 --new_len 4096 example_exams/RECORDS.txt example_exams.h5
 ```
-So, they were scaled by 2 and the leads were added so it compleat the 12 leads.
-The baseline was not removed.
+So, they were scaled by 2, the leads were added so it compleate the 12 leads, they are resampled 
+to 400Hz and have their length changed to 4096.  The baseline was not removed.
 

@@ -7,20 +7,20 @@ reduced_leads = ['DI', 'DII', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 all_leads = ['DI', 'DII', 'DIII', 'AVR', 'AVL', 'AVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 
 
-def arg_parse_option(parser):
+def arg_parse_option(parser, new_len=None, new_freq=None, scale=None):
     """Argparse options for preprocessing"""
     parser.add_argument('--remove_baseline', action='store_true',
                         help='if this option, remove baseline by applying high pass filter.')
-    parser.add_argument('--new_len', default=4096, type=int,
+    parser.add_argument('--new_len', type=int, default=None,
                         help='final length after preprocessing. It will add zero or clip the ECG to get the length.'
                              'The default is 4096, which is a power of two and convenient to work with Convolutional'
                              'Neural networks.')
-    parser.add_argument('--new_freq', default=400, type=float,
+    parser.add_argument('--new_freq', type=float, default=None,
                         help='the ecg will be resampled to the provided frquency (in Hz). Default is 400Hz.')
-    parser.add_argument('--scale', default=1, type=float,
+    parser.add_argument('--scale', type=float, default=1,
                         help='the ecg will be rescaled by the provided factor.')
     parser.add_argument('--use_all_leads', action='store_true',
-                        help="If true comput leads 'DIII', 'AVR', 'AVL', 'AVF' from the remaining ones.")
+                        help="If true compute leads 'DIII', 'AVR', 'AVL', 'AVF' from the remaining ones.")
     return parser
 
 
@@ -44,7 +44,7 @@ def remove_baseline_filter(sample_rate):
     return sos
 
 
-def preprocess_ecg(ecg, sample_rate, leads, new_freq=400, new_len=4096, scale=2,
+def preprocess_ecg(ecg, sample_rate, leads, new_freq=None, new_len=None, scale=1,
                    use_all_leads=True, remove_baseline=False):
     # Remove baseline
     if remove_baseline:
@@ -54,9 +54,12 @@ def preprocess_ecg(ecg, sample_rate, leads, new_freq=400, new_len=4096, scale=2,
         ecg_nobaseline = ecg
 
     # Resample
-    ecg_resampled = sgn.resample_poly(ecg_nobaseline, up=new_freq, down=sample_rate, axis=-1)
+    if new_freq is not None:
+        ecg_resampled = sgn.resample_poly(ecg_nobaseline, up=new_freq, down=sample_rate, axis=-1)
+    else:
+        ecg_resampled = ecg_nobaseline
+        new_freq = sample_rate
     n_leads, length = ecg_resampled.shape
-
     # Rescale
     ecg_rescaled = scale * ecg_resampled
 
@@ -75,7 +78,9 @@ def preprocess_ecg(ecg, sample_rate, leads, new_freq=400, new_len=4096, scale=2,
         ecg_targetleads[l2p['AVF'], :] = (ecg_targetleads[l2p['DII'], :] + ecg_targetleads[l2p['DIII'], :]) / 2
 
     # Reshape
-    if new_len > length:
+    if new_len is None or new_len == length:
+        ecg_reshaped = ecg_targetleads
+    elif new_len > length:
         ecg_reshaped = np.zeros([n_leads_target, new_len])
         pad = (new_len - length) // 2
         ecg_reshaped[..., pad:length+pad] = ecg_targetleads
