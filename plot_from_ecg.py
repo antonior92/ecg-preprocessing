@@ -3,6 +3,7 @@ import argparse
 import matplotlib.pyplot as plt
 import preprocess
 import os
+import read_ecg
 
 
 if __name__ == '__main__':
@@ -13,10 +14,12 @@ if __name__ == '__main__':
     parser.add_argument('--save', default="",
                         help='Save in the provided path. Otherwise just display image.')
     parser = preprocess.arg_parse_option(parser)
+    parser = read_ecg.arg_parse_option(parser)
     args = parser.parse_args()
     print(args)
 
-    ecg, sample_rate, leads = preprocess.read(args.path)
+    print(args.fmt)
+    ecg, sample_rate, leads = read_ecg.read_ecg(args.path, format=args.fmt)
     ecg, sample_rate, leads = preprocess.preprocess_ecg(ecg, sample_rate, leads,
                                                         new_freq=args.new_freq,
                                                         new_len=args.new_len,

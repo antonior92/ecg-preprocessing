@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.signal  as sgn
 
-import wfdb
 
 reduced_leads = ['DI', 'DII', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 all_leads = ['DI', 'DII', 'DIII', 'AVR', 'AVL', 'AVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
@@ -22,12 +21,6 @@ def arg_parse_option(parser, new_len=None, new_freq=None, scale=None):
     parser.add_argument('--use_all_leads', action='store_true',
                         help="If true compute leads 'DIII', 'AVR', 'AVL', 'AVF' from the remaining ones.")
     return parser
-
-
-def read(path):
-    """Read wfdb record"""
-    record = wfdb.rdrecord(path)
-    return record.p_signal.T, record.fs, record.sig_name
 
 
 def remove_baseline_filter(sample_rate):

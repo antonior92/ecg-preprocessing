@@ -39,13 +39,13 @@ corresponding exam ids.
 Before removing baseline:
 ```sh
 PATH_TO_EXAM=example_exams/TNMG247001_N1
-python plot_from_wfdb.py $PATH_TO_EXAM --use_all_leads
+python plot_from_ecg.py $PATH_TO_EXAM --use_all_leads
 ```
 ![before](./img/before.png)
 
 After  removing baseline:
 ```sh
-python plot_from_wfdb.py $PATH_TO_EXAM --remove_baseline --use_all_leads
+python plot_from_ecg.py $PATH_TO_EXAM --remove_baseline --use_all_leads
 ```
 ![after](./img/after.png)
 
