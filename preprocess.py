@@ -20,6 +20,9 @@ def arg_parse_option(parser, new_len=None, new_freq=None, scale=None):
                         help='the ecg will be rescaled by the provided factor.')
     parser.add_argument('--use_all_leads', action='store_true',
                         help="If true compute leads 'DIII', 'AVR', 'AVL', 'AVF' from the remaining ones.")
+    parser.add_argument('--powerline', type=float, default=None,
+                        help='If included use notch filter to remove powerline interference.'
+                             ' Default is None and dont include the filter.')
     return parser
 
 
@@ -38,7 +41,7 @@ def remove_baseline_filter(sample_rate):
 
 
 def preprocess_ecg(ecg, sample_rate, leads, new_freq=None, new_len=None, scale=1,
-                   use_all_leads=True, remove_baseline=False):
+                   use_all_leads=True, remove_baseline=False, powerline=None):
     # Remove baseline
     if remove_baseline:
         sos = remove_baseline_filter(sample_rate)
@@ -46,11 +49,20 @@ def preprocess_ecg(ecg, sample_rate, leads, new_freq=None, new_len=None, scale=1
     else:
         ecg_nobaseline = ecg
 
+    # Remove powerline
+    if powerline is None:
+        ecg_nopowerline = ecg_nobaseline
+    else:
+        # Design notch filter
+        q = 30.0  # Quality factor
+        b, a = sgn.iirnotch(powerline, q, fs=sample_rate)
+        ecg_nopowerline = sgn.filtfilt(b, a, ecg_nobaseline)
+
     # Resample
     if new_freq is not None:
-        ecg_resampled = sgn.resample_poly(ecg_nobaseline, up=new_freq, down=sample_rate, axis=-1)
+        ecg_resampled = sgn.resample_poly(ecg_nopowerline, up=new_freq, down=sample_rate, axis=-1)
     else:
-        ecg_resampled = ecg_nobaseline
+        ecg_resampled = ecg_nopowerline
         new_freq = sample_rate
     n_leads, length = ecg_resampled.shape
     # Rescale
