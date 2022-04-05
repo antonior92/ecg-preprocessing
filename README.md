@@ -49,6 +49,18 @@ python plot_from_ecg.py $PATH_TO_EXAM --remove_baseline --use_all_leads
 ```
 ![after](./img/after.png)
 
+
+
+# Example: plot periodogram
+
+We also provide functionalities to plot the periodogram from the ecg:
+```sh
+PATH_TO_EXAM=example_exams/TNMG2834_N1
+python plot_periodogram.py $PATH_TO_EXAM
+```
+![periodogram](./img/periodogram.png)
+
+
 # Generate HDF5 from WFDB
 
 The following command read ECG paths from RECORDS.txt sequentially and store them in an hdf5 file:

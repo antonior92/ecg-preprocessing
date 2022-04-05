@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import preprocess
 import os
 import read_ecg
+import scipy.signal as sgn
 
 
 if __name__ == '__main__':
@@ -26,24 +27,27 @@ if __name__ == '__main__':
                                                         powerline=args.powerline,
                                                         use_all_leads=args.use_all_leads,
                                                         remove_baseline=args.remove_baseline)
-    ecg_plot.plot(ecg, sample_rate=sample_rate,
-                  lead_index=leads, style='bw')
-    # rm ticks
-    plt.tick_params(
-        axis='both',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        bottom=False,  # ticks along the bottom edge are off
-        top=False,  # ticks along the top edge are off
-        left=False,
-        right=False,
-        labelleft=False,
-        labelbottom=False)  # labels along the bottom edge are off
 
+    freq, Pxx = sgn.welch(ecg[0], sample_rate, window='hamming', nperseg=2500, nfft=10000, scaling='density')
+
+    fig, ax = plt.subplots(ncols=2)
+    ax[0].plot(freq, Pxx)
+    ax[0].grid()
+    ax[0].set_title("Linear scale")
+    ax[0].set_ylabel("Power Spectral Density (mV$^2/$Hz)")
+    ax[0].set_xlabel("Frequency (Hz)")
+    ax[0].set_xlim([0, 60])
+    ax[1].grid()
+    ax[1].plot(freq, Pxx)
+    ax[1].axvline(sample_rate/2, color='black', ls='--')
+    ax[1].set_title("Log scale")
+    ax[1].set_xlabel("Frequency (Hz)")
+    ax[1].set_yscale('log')
+    ax[1].set_xlim([0, 250])
+    ax[1].set_ylim([1e-9, 1e-1])
+    plt.suptitle('Welch Periodogram')
+    plt.tight_layout()
     if args.save:
-        path, ext = os.path.splitext(args.save)
-        if ext == '.png':
-            ecg_plot.save_as_png(path)
-        elif ext == '.pdf':
-            ecg_plot.save_as_pdf(path)
+        plt.savefig(args.save)
     else:
-        ecg_plot.show()
+        plt.show()
