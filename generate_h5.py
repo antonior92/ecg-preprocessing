@@ -29,7 +29,7 @@ if __name__ == '__main__':
     n = len(files)  # Get length
 
     h5f = h5py.File(args.out_file, 'w')
-    x = h5f.create_dataset('tracings', (n, 4096, len(preprocess.all_leads)), dtype='f8')
+    x = None
     for i, f in enumerate(tqdm.tqdm(files)):
         ecg, sample_rate, leads = read_ecg.read_ecg(os.path.join(folder, f), format=args.fmt)
         ecg_preprocessed, new_rate, new_leads = preprocess.preprocess_ecg(ecg, sample_rate, leads,
@@ -39,6 +39,9 @@ if __name__ == '__main__':
                                                                           powerline=args.powerline,
                                                                           use_all_leads=args.use_all_leads,
                                                                           remove_baseline=args.remove_baseline)
+        if x is None:
+            n_leads, n_samples = ecg_preprocessed.shape
+            x = h5f.create_dataset('tracings', (n, n_samples, n_leads), dtype='f8')
         x[i, :, :] = ecg_preprocessed.T
 
     h5f.close()
