@@ -12,6 +12,9 @@ if __name__ == '__main__':
     parser.add_argument('input_file', type=str, help='path to RECORDS file.')
     parser.add_argument('out_file', type=str,
                         help='output file containing the plots. ')
+    parser.add_argument('--root_dir', type=str,
+                        help='The root directory which the relative paths refer to. '
+                             'If None just use the folder where `input_file` is.')
     parser = preprocess.arg_parse_option(parser)
     parser = read_ecg.arg_parse_option(parser)
     args = parser.parse_args()
@@ -19,7 +22,10 @@ if __name__ == '__main__':
 
     # open files
     files = pd.read_csv(args.input_file, header=None).values.flatten()
-    folder = os.path.dirname(args.input_file)
+    if args.root_dir is None:
+        folder = os.path.dirname(args.input_file)
+    else:
+        folder = args.root_dir
     n = len(files)  # Get length
 
     h5f = h5py.File(args.out_file, 'w')
