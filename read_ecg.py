@@ -72,7 +72,7 @@ def read_musexml(file):
             leads.append(l)
     return ecg, sample_rate, leads
 
-#
+
 def read_lead(string_representation):
     return np.array([int(n) for n in string_representation.split(';') if n], dtype='<i2')
 
