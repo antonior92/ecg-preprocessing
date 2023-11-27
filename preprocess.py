@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.signal as sgn
-import pdb
 
 reduced_leads = ['DI', 'DII', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 all_leads = ['DI', 'DII', 'DIII', 'AVR', 'AVL', 'AVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
@@ -50,8 +49,6 @@ def remove_powerline_filter(remove_powerline, sample_rate):
 
 def preprocess_ecg(ecg, sample_rate, leads, new_freq=None, new_len=None, scale=1,
                    use_all_leads=False, remove_baseline=False, remove_powerline=None):
-    
-    #pdb.set_trace()  # Isso inicia a depuração interativa
     
     # Remove baseline
     if remove_baseline:
