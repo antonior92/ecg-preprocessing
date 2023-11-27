@@ -2,9 +2,8 @@ import numpy as np
 import scipy.signal as sgn
 import pdb
 
-
-reduced_leads = ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'DI', 'DII']
-all_leads = ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'DI', 'DII', 'DIII', 'AVR', 'AVL', 'AVF']
+reduced_leads = ['DI', 'DII', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
+all_leads = ['DI', 'DII', 'DIII', 'AVR', 'AVL', 'AVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 
 
 def arg_parse_option(parser, new_len=None, new_freq=None, scale=None):
