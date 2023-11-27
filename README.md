@@ -11,6 +11,28 @@ Some of the datasets from our group are made available after this preprocessing 
 - SamiTop: https://doi.org/10.5281/zenodo.4905618
 - CODE-Test: https://doi.org/10.5281/zenodo.3765780
 
+# Installation
+
+1) **Download repository from github**
+
+```bash
+git clone git@github.com:antonior92/ecg-preprocessing.git
+# or, alternatively:
+# git clone https://github.com/antonior92/ecg-preprocessing.git
+```
+
+2) **Install package**
+
+Move into the downloaded directory and install requirements with:
+```bash
+pip install -r requirements.txt
+```
+
+In sequence, install package with:
+```bash
+python setup.py install
+```
+
 # Example 
 
 Some example WFDB files before preprocessing are available in the [link](https://www.dropbox.com/sh/zmbd3y68vu7xzyv/AAAsnS766BfWhSxwvcOOVGAXa?dl=0)

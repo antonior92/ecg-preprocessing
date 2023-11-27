@@ -1,14 +1,12 @@
 if __name__ == '__main__':
-    import preprocess
-    import read_ecg
+    from ecgprep import preprocess, read_ecg
     import argparse
     import h5py
     import pandas as pd
     import tqdm
     import os
 
-    parser = argparse.ArgumentParser(description='Read XML muse and plot the first lead of the obtained ECG. Plot '
-                                                 'the first lead and its frequency response.')
+    parser = argparse.ArgumentParser(description='Generate HDF5 from files')
     parser.add_argument('input_file', type=str, help='path to RECORDS file.')
     parser.add_argument('out_file', type=str,
                         help='output file containing the plots. ')

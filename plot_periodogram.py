@@ -1,9 +1,6 @@
-import ecg_plot
 import argparse
 import matplotlib.pyplot as plt
-import preprocess
-import os
-import read_ecg
+from ecgprep import preprocess, read_ecg
 import scipy.signal as sgn
 
 
