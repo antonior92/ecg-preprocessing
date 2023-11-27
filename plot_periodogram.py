@@ -24,7 +24,7 @@ if __name__ == '__main__':
                                                         new_freq=args.new_freq,
                                                         new_len=args.new_len,
                                                         scale=args.scale,
-                                                        powerline=args.powerline,
+                                                        remove_powerline=args.remove_powerline,
                                                         use_all_leads=args.use_all_leads,
                                                         remove_baseline=args.remove_baseline)
 
