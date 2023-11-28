@@ -8,7 +8,6 @@ import os
 
 fmts = ['wfdb', 'musexml','json_tnmg']
 
-
 def arg_parse_option(parser):
     """Argparse options for read ecg"""
     parser.add_argument('--fmt', choices=fmts, default='wfdb',
@@ -57,14 +56,17 @@ def read_wfdb(path):
 
 
 def read_musexml(xml_str):
-    """Read ge musexml record"""
+    """Read ge musexml record"""    
     ordered_dict = bf.data(fromstring(xml_str))
     wf = ordered_dict['RestingECG']['Waveform'][1]
     sample_rate = wf['SampleBase']['$']
 
     ecg_data = {}
     for lead in wf['LeadData']:
-        scaling = float(lead['LeadAmplitudeUnitsPerBit']['$'].replace(',', '.'))
+        if isinstance(lead['LeadAmplitudeUnitsPerBit']['$'], str):
+            scaling = float(lead['LeadAmplitudeUnitsPerBit']['$'].replace(',', '.'))
+        else:
+            scaling = float(lead['LeadAmplitudeUnitsPerBit']['$'])
         unit = lead['LeadAmplitudeUnits']['$'].lower()
 
         if unit == 'microvolts':
@@ -119,7 +121,10 @@ def read_dict_tnmg(d):
     # Read the resolution  
     resolution = d['resolution']
     # Read the sample rate
-    sample_rate = d['sampling']
+    try:
+        sample_rate = d['sample_rate']
+    except:
+        sample_rate = d['sampling']
     # Read all available ECG leads and convert them to numpy format
     ecg_np, leads = read_all_leads(d, ['DI', 'DII', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'])
     # Convert to microvolts measurements
