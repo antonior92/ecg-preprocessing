@@ -8,7 +8,6 @@ import os
 
 fmts = ['wfdb', 'musexml','json_tnmg']
 
-
 def arg_parse_option(parser):
     """Argparse options for read ecg"""
     parser.add_argument('--fmt', choices=fmts, default='wfdb',
@@ -17,13 +16,34 @@ def arg_parse_option(parser):
 
 
 def read_ecg(path, format='wfdb'):
-    """Read ECG record"""
+    """Read ECG record from file path"""
     if format == 'wfdb':
+        # Load data from WFDB file
         return read_wfdb(path)
     elif format == 'musexml':
-        return read_musexml(path)
+        # Load data from XML file
+        with open(path, 'r') as f:
+            xml_str = f.read()
+        return read_musexml(xml_str)
+    elif format == 'json_tnmg':  
+        # Load data from JSON file
+        with open(path,'r') as file:
+            d = json.load(file)
+        return read_dict_tnmg(d)
+    else:
+        raise ValueError('Unknown format')
+
+
+def read_ecg_string(str_content, format='json_tnmg'):
+    """Read ECG record from data string"""
+    if format == 'wfdb':
+        raise ValueError('wfdb format is not supported for strings')
+    elif format == 'musexml':
+        # Load data directly from XML string
+        return read_musexml(str_content)
     elif format == 'json_tnmg':
-        d = read_json_tnmg(path)
+        # Load data directly from JSON string
+        d = json.loads(str_content)
         return read_dict_tnmg(d)
     else:
         raise ValueError('Unknown format')
@@ -35,18 +55,18 @@ def read_wfdb(path):
     return record.p_signal.T, record.fs, record.sig_name
 
 
-def read_musexml(file):
-    """Read ge musexml record"""
-    with open(file, 'r') as f:
-        xml_str = f.read()
-
+def read_musexml(xml_str):
+    """Read ge musexml record"""    
     ordered_dict = bf.data(fromstring(xml_str))
     wf = ordered_dict['RestingECG']['Waveform'][1]
     sample_rate = wf['SampleBase']['$']
 
     ecg_data = {}
     for lead in wf['LeadData']:
-        scaling = float(lead['LeadAmplitudeUnitsPerBit']['$'].replace(',', '.'))
+        if isinstance(lead['LeadAmplitudeUnitsPerBit']['$'], str):
+            scaling = float(lead['LeadAmplitudeUnitsPerBit']['$'].replace(',', '.'))
+        else:
+            scaling = float(lead['LeadAmplitudeUnitsPerBit']['$'])
         unit = lead['LeadAmplitudeUnits']['$'].lower()
 
         if unit == 'microvolts':
@@ -96,28 +116,17 @@ def convert_to_mv(x, resolution):
     return x / 1000 * resolution
 
 
-def read_json_tnmg(path_or_content):
-    """Read json record"""    
-    # Check if 'path' is a string with JSON data or a JSON filename
-    if isinstance(path_or_content, str) and os.path.isfile(path_or_content):
-        # If it is a string that matches a file, load the data from the JSON file
-        with open(path_or_content,'r') as file:
-            d = json.load(file)
-    else:
-        # If it is a string that represents JSON data, load the data directly
-        d = json.loads(path_or_content)
-    # Return data as a dictionary
-    return d
-
-
 def read_dict_tnmg(d):
     """Read dictionary record"""
     # Read the resolution  
     resolution = d['resolution']
     # Read the sample rate
-    sample_rate = d['sampling']
+    try:
+        sample_rate = d['sample_rate']
+    except:
+        sample_rate = d['sampling']
     # Read all available ECG leads and convert them to numpy format
-    ecg_np, leads = read_all_leads(d, ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'DI', 'DII'])
+    ecg_np, leads = read_all_leads(d, ['DI', 'DII', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'])
     # Convert to microvolts measurements
     ecg = convert_to_mv(ecg_np, resolution)
     return ecg, sample_rate, leads
