@@ -5,3 +5,4 @@ xmljson>=0.1.9
 scipy>=1.1
 tqdm>=4.26
 wfdb>=3.4
+ecg_plot
