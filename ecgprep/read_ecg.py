@@ -22,8 +22,6 @@ def read_ecg(path, format='wfdb'):
         return read_wfdb(path)
     elif format == 'musexml':
         return read_musexml(path)
-    elif format == 'leadstudy_xml':
-        return read_leadstudy_xml(path)
     elif format == 'json_tnmg':
         d = read_json_tnmg(path)
         return read_dict_tnmg(d)
@@ -73,34 +71,6 @@ def read_musexml(file):
             leads.append(l)
     return ecg, sample_rate, leads
 
-def read_leadstudy_xml(file):
-    with open(file, 'r', encoding='unicode_escape') as f:
-        xml_str = f.read()
-
-    ordered_dict = bf.data(fromstring(xml_str))['CardiologyXML']['StripData']
-    sample_rate = ordered_dict['SampleRate']['$']
-    print(sample_rate)
-    wf = ordered_dict['WaveformData']
-
-    if ordered_dict['Resolution']['@units'] == 'uVperLsb':
-        scaling = ordered_dict['Resolution']['$'] / 1000
-    else:
-        raise ValueError("Invalid Scalling")
-
-    ecg_data = {}
-    for lead in wf:
-        string_representation = lead['$']
-        ecg_data[lead['@lead']] = scaling * np.array([int(n.strip()) for n in string_representation.split(',') if n],
-                                                     dtype='<i2')
-    # Stack data and return numpy array
-    ecg = np.stack(list(ecg_data.values()), axis=0)
-    leads = []
-    for l in ecg_data.keys():
-        if l in ["I", "II", "III"]:
-            leads.append("D" + l)
-        else:
-            leads.append(l)
-    return ecg, sample_rate, leads
 
 def read_lead(string_representation):
     return np.array([int(n) for n in string_representation.split(';') if n], dtype='<i2')

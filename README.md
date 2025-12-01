@@ -33,7 +33,7 @@ In sequence, install package with:
 python setup.py install
 ```
 
-# Example 
+# Examples
 
 Some example WFDB files before preprocessing are available in the [link](https://www.dropbox.com/sh/zmbd3y68vu7xzyv/AAAsnS766BfWhSxwvcOOVGAXa?dl=0)
 and can be downloaded through the commands
@@ -56,7 +56,16 @@ The first four exams belong to the [SamiTrop dataset](https://doi.org/10.5281/ze
 the [CODE-15% dataset](https://doi.org/10.5281/zenodo.4916206).  You can check them there by searching for the 
 corresponding exam ids.
 
-# Example: plot the exam before and after the removing baseline
+You can also try it with the follow exam from PTB-XL
+```sh
+mkdir ptbxl
+wget -nc  https://physionet.org/files/ptb-xl/1.0.1/records500/00000/00001_hr.dat
+wget -nc  https://physionet.org/files/ptb-xl/1.0.1/records500/00000/00001_hr.hea
+mv 00001_hr.dat  ptbxl
+mv 00001_hr.hea  ptbxl
+```
+
+## Example: plot the exam before and after the removing baseline
 
 Before removing baseline:
 ```sh
@@ -72,8 +81,15 @@ python plot_from_ecg.py $PATH_TO_EXAM --remove_baseline --use_all_leads
 ![after](./img/after.png)
 
 
+## Example: load and plot one exam from PTB-XL
 
-# Example: plot periodogram
+Below we provide an additional example from PTB-XL
+```sh
+PATH_TO_EXAM=ptbxl/00001_hr
+python plot_from_ecg.py $PATH_TO_EXAM --remove_baseline --use_all_leads
+```
+
+## Example: plot periodogram
 
 We also provide functionalities to plot the periodogram from the ecg:
 ```sh
@@ -81,6 +97,9 @@ PATH_TO_EXAM=example_exams/TNMG2834_N1
 python plot_periodogram.py $PATH_TO_EXAM
 ```
 ![periodogram](./img/periodogram.png)
+
+
+
 
 
 # Generate HDF5 from WFDB
