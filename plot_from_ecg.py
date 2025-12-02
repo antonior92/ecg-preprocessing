@@ -1,7 +1,7 @@
 import ecg_plot
 import argparse
 import matplotlib.pyplot as plt
-from ecgprep import preprocess, read_ecg
+from ecgprep import preprocess, read_ecg, plot_helpers
 import os
 
 if __name__ == '__main__':
@@ -11,10 +11,18 @@ if __name__ == '__main__':
                         help='Path to the file to be plot.')
     parser.add_argument('--save', default="",
                         help='Save in the provided path. Otherwise just display image.')
+    parser.add_argument('--plot3x4', action='store_true',
+                        help='plot 3x4')
+    parser.add_argument('--long_leads_3by4', nargs='+',default=['DII'],
+                        help='Long leads 3by4')
     parser = preprocess.arg_parse_option(parser)
     parser = read_ecg.arg_parse_option(parser)
     args = parser.parse_args()
     print(args)
+
+    if args.plot3x4 and args.use_all_leads is False:
+        args.use_all_leads = True
+        print('for 3x4 we always use all leads')
 
     ecg, sample_rate, leads = read_ecg.read_ecg(args.path, format=args.fmt)
     ecg, sample_rate, leads = preprocess.preprocess_ecg(ecg, sample_rate, leads,
@@ -24,8 +32,17 @@ if __name__ == '__main__':
                                                         remove_powerline=args.remove_powerline,
                                                         use_all_leads=args.use_all_leads,
                                                         remove_baseline=args.remove_baseline)
-    ecg_plot.plot(ecg, sample_rate=sample_rate,
-                  lead_index=leads, style='bw')
+
+    if args.plot3x4:
+        ecg, leads = plot_helpers.get_3by4_format(ecg, leads)
+        ecg_plot.plot(ecg, sample_rate=sample_rate,
+                      lead_index=leads, style='bw', columns=4)
+    else:
+        ecg_plot.plot(ecg, sample_rate=sample_rate,
+                      lead_index=leads, style='bw', columns=2)
+
+
+
     # rm ticks
     plt.tick_params(
         axis='both',  # changes apply to the x-axis
