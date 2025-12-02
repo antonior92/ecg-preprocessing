@@ -15,18 +15,30 @@ def arg_parse_option(parser):
                         help='format used.')    
     return parser
 
+def make_lead_names_uniform(leads):
+    # Define the mapping for the leads that need changing
+    mapping = {
+        'I': 'DI',
+        'II': 'DII',
+        'III': 'DIII'
+    }
+    # valid for both returning a new list or modifying in place (if needed)
+    # here we return a new list
+    return [mapping.get(lead.upper(), lead.upper()) for lead in leads]
 
 def read_ecg(path, format='wfdb'):
     """Read ECG record"""
     if format == 'wfdb':
-        return read_wfdb(path)
+        signal, sampling_frequency, leads = read_wfdb(path)
     elif format == 'musexml':
-        return read_musexml(path)
+        signal, sampling_frequency, leads  =  read_musexml(path)
     elif format == 'json_tnmg':
         d = read_json_tnmg(path)
-        return read_dict_tnmg(d)
+        signal, sampling_frequency, leads = read_dict_tnmg(d)
     else:
         raise ValueError('Unknown format')
+
+    return signal, sampling_frequency, make_lead_names_uniform(leads)
 
 
 def read_wfdb(path):
