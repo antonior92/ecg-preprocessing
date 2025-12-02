@@ -88,7 +88,7 @@ Below we provide an additional example from PTB-XL. Now using 3 by 4 format.
 PATH_TO_EXAM=ptbxl/00001_hr
 python plot_from_ecg.py $PATH_TO_EXAM --remove_baseline --use_all_leads --plot3x4
 ```
-![3by4](./img/ptbxl.pnf)
+![3by4](./img/ptbxl.png)
 
 
 ## Example: plot periodogram
