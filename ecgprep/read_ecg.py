@@ -118,13 +118,13 @@ def read_musexml_KI(file):
 
 
 def read_lead(string_representation):
-    return np.array([int(n) for n in string_representation.split(';') if n], dtype='<i2')
+    return np.array([int(n) for n in string_representation.split(';') if n], dtype='<i4')
 
 
 def read_all_leads(c, leads):
     l1 = read_lead(c[leads[0]])
     n = len(l1)
-    ecg = np.zeros((len(leads), n), dtype='<i2')
+    ecg = np.zeros((len(leads), n), dtype='<i4')
     ecg[0, :] = l1
     leads_available = []
     leads_available.append(leads[0])
